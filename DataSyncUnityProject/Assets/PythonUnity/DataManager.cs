@@ -54,7 +54,8 @@ public class DataManager : MonoBehaviour
 					break;
 				}
 			}
-			yield return new WaitForSeconds(1f);
+
+			yield return null; // new WaitForSeconds(1f);
 		}
 	}
 
@@ -79,7 +80,6 @@ public class DataManager : MonoBehaviour
 					break;
 				}
 			}
-
 			yield return null;
 		}
 	}
