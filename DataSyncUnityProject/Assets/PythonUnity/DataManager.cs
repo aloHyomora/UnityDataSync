@@ -14,6 +14,8 @@ public class DataManager : MonoBehaviour
 	private void Start()
 	{
 		ConnectToServer();
+		StartCoroutine(SendingIntDataRoutine());
+		StartCoroutine(ReceivingFloatDataRoutine());
 	}
 
 	void ConnectToServer()
@@ -25,8 +27,7 @@ public class DataManager : MonoBehaviour
 			_reader = new StreamReader(_stream);
 			Debug.Log($"Connected to server.");
 			
-			StartCoroutine(SendingDataRoutine());
-			StartCoroutine(ReceivingDataRoutine());
+			
 		}
 		catch (Exception e)
 		{
@@ -35,7 +36,7 @@ public class DataManager : MonoBehaviour
 		}
 	}
 
-	IEnumerator SendingDataRoutine()
+	IEnumerator SendingIntDataRoutine()
 	{
 		while (true)
 		{
@@ -59,7 +60,7 @@ public class DataManager : MonoBehaviour
 		}
 	}
 
-	IEnumerator ReceivingDataRoutine()
+	IEnumerator ReceivingFloatDataRoutine()
 	{
 		while (true)
 		{
