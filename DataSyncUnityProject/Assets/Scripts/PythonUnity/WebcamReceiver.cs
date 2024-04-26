@@ -1,10 +1,9 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
-using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class WebcamReceiver : MonoBehaviour
 {
@@ -15,6 +14,7 @@ public class WebcamReceiver : MonoBehaviour
 
     public Texture2D texture;
     public Material rawImageMaterial;
+    public RawImage rawImage;
     private void Start()
     {
         InitializeSocket();
@@ -30,29 +30,41 @@ public class WebcamReceiver : MonoBehaviour
 
     private IEnumerator ReceiveData()
     {
-        BinaryFormatter formatter = new BinaryFormatter(); //바이너리 데이터 직렬화를 위한 formatter
-
         while (true)
         {
             if (_stream.DataAvailable)          // 데이터가 스트림에 있는지 확인
             {
                 byte[] sizeInfo = new byte[4];  // 파이썬에서 4바이트 빅엔디언 포맷으로 패킹해서 전송함.
-                Debug.Log(sizeInfo.Length);
-                if (ReadFull(_stream, sizeInfo, sizeInfo.Length)) // 스트림에서 데이터를 읽음
+                if (ReadFull(_stream, sizeInfo, sizeInfo.Length)) // 스트림에서 데이터 하나를 모두 읽음
                 {
                     Array.Reverse(sizeInfo);
                     int webcamDataSize = BitConverter.ToInt32(sizeInfo, 0); // sizeInfo 바이트 배열엔 웹캠 데이터의 크기가 바이트 배열로 담겨있음.
                     Debug.Log(webcamDataSize);
                     byte[] data = new byte[webcamDataSize];     // 데이터를 저장할 바이트 배열
-                    _stream.Read(data, 0, webcamDataSize); // 스트림에서 데이터를 읽음
-
-                    MemoryStream ms = new MemoryStream(data); // 읽은 데이터 메모리스트림으로 변환,  Class MemoryStream : Stream
-                    texture.LoadImage((byte[])formatter.Deserialize(ms)); // 메모리스트림 텍스쳐로 변환
-
-                    yield return null;
-                    rawImageMaterial.mainTexture = texture;
+                    if (ReadFull(_stream, data, webcamDataSize)) // 스트림에서 데이터를 읽음
+                    {
+                        // 이제 이미지를 텍스처로 로드
+                        if (texture.LoadImage(data)) // JPEG 이미지 데이터를 Texture2D로 직접 로드
+                        {
+                            // rawImageMaterial.mainTexture = texture; // 텍스처를 머티리얼에 적용
+                            rawImage.texture = texture;
+                        }
+                        else
+                        {
+                            Debug.LogError("Failed to load texture from received data");
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("Incomplete data received");
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Failed to read size information");
                 }
             }
+            yield return null; // 대기 없이 계속 루프를 돌게 하여 응답을 빠르게 처리
         }
     }
     private bool ReadFull(Stream stream, byte[] buffer, int size)
