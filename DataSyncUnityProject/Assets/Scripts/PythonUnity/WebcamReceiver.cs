@@ -35,8 +35,6 @@ public class WebcamReceiver : MonoBehaviour
             {
                 int width = BitConverter.ToInt32(dimensionInfo, 0);
                 int height = BitConverter.ToInt32(dimensionInfo, 4);
-                Debug.Log($"{width}  {height}");
-                texture = new Texture2D(width, height, TextureFormat.RGB24, false);
                 ResizeRawImage(width, height);
                 break;
             }
@@ -80,6 +78,7 @@ public class WebcamReceiver : MonoBehaviour
     }
     private bool ReadFull(Stream stream, byte[] buffer, int size)
     {
+        // 스트림의 끝까지 데이터를 읽어 buffer에 저장한다.
         int index = 0;
         while (index < size)
         {
@@ -95,6 +94,7 @@ public class WebcamReceiver : MonoBehaviour
     public void ResizeRawImage(int width, int height)
     {
         // 해상도에 따라 RawImage의 크기를 조절
+        texture = new Texture2D(width, height, TextureFormat.RGB24, false);
         rawImageRectTransform.sizeDelta = new Vector2(width, height);
     }
     private void OnApplicationQuit()

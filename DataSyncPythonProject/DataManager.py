@@ -5,7 +5,7 @@ import struct
 
 
 def DataReadIntValueWriteFloatValue():
-    # 소켓 객체 생성
+    # Int 타입으로 수신, float 형변환 Unity로 송신
     with socket.socket(
         socket.AF_INET, socket.SOCK_STREAM
     ) as so:  # 네트워크 리소스 사용 후 자동으로 정리, 소켓 사용이 끝나면 자동으로 소켓을 닫음.
@@ -52,6 +52,7 @@ def DataReadIntValueWriteFloatValue():
 
 
 def open_local_webCam():
+    # window view로 webcam 화면 출력
     cv2.namedWindow("first Frame")
     vc = cv2.VideoCapture(0)
 
