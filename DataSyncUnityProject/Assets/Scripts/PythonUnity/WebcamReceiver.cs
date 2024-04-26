@@ -13,21 +13,19 @@ public class WebcamReceiver : MonoBehaviour
     private NetworkStream _stream;          // 네트워크 스트림
 
     public Texture2D texture;
-    public Material rawImageMaterial;
+    public RectTransform rawImageRectTransform; // Inspector에서 할당
     public RawImage rawImage;
     private void Start()
     {
         InitializeSocket();
         StartCoroutine(ReceiveData());
     }
-
     void InitializeSocket()
     {
         _client = new TcpClient(serverIP, serverPort);  // IP 주소와 포트로 TCP 클라이언트 초기화
         _stream = _client.GetStream();                  // 클라이언트의 데이터 스트림을 가져옴
         texture = new Texture2D(0, 0);
     }
-
     private IEnumerator ReceiveData()
     {
         byte[] dimensionInfo = new byte[8];
@@ -39,6 +37,7 @@ public class WebcamReceiver : MonoBehaviour
                 int height = BitConverter.ToInt32(dimensionInfo, 4);
                 Debug.Log($"{width}  {height}");
                 texture = new Texture2D(width, height, TextureFormat.RGB24, false);
+                ResizeRawImage(width, height);
                 break;
             }
         }
@@ -92,6 +91,11 @@ public class WebcamReceiver : MonoBehaviour
             index += bytesRead;
         }
         return true;
+    }
+    public void ResizeRawImage(int width, int height)
+    {
+        // 해상도에 따라 RawImage의 크기를 조절
+        rawImageRectTransform.sizeDelta = new Vector2(width, height);
     }
     private void OnApplicationQuit()
     {
