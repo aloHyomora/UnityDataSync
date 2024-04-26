@@ -72,8 +72,9 @@ def open_local_webCam():
 
 
 def send_webcam_data(connection):
-    """웹캠 데이터를 소켓을 통해 전송"""
+    """웹캠 데이터를 JPEG 포맷으로 소켓을 통해 전송"""
     vc = cv2.VideoCapture(0)  # 웹캠 초기화
+    send_webcam_size_data(connection, vc)
 
     try:
         while vc.isOpened():
@@ -93,6 +94,19 @@ def send_webcam_data(connection):
             connection.sendall(size + data)
     finally:
         connection.close()
+
+
+def send_webcam_size_data(connection, videoCapture):
+    # 최초 1회 카메라 해상도 설정 및 전성
+    videoCapture.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)  # 너비 설정
+    videoCapture.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)  # 높이 설정
+
+    height = int(videoCapture.get(cv2.CAP_PROP_FRAME_WIDTH))
+    width = int(videoCapture.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    # 초기 설정 정보 전송 (해상도)
+    init_info = struct.pack(">II", width, height)
+    connection.sendall(init_info)
 
 
 def initialize_socket(host, port):
