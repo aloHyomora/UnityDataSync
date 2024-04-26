@@ -30,6 +30,19 @@ public class WebcamReceiver : MonoBehaviour
 
     private IEnumerator ReceiveData()
     {
+        byte[] dimensionInfo = new byte[8];
+        while (true)
+        {
+            if (ReadFull(_stream, dimensionInfo, 8))
+            {
+                int width = BitConverter.ToInt32(dimensionInfo, 0);
+                int height = BitConverter.ToInt32(dimensionInfo, 4);
+                Debug.Log($"{width}  {height}");
+                texture = new Texture2D(width, height, TextureFormat.RGB24, false);
+                break;
+            }
+        }
+        
         while (true)
         {
             if (_stream.DataAvailable)          // 데이터가 스트림에 있는지 확인
@@ -39,7 +52,6 @@ public class WebcamReceiver : MonoBehaviour
                 {
                     Array.Reverse(sizeInfo);
                     int webcamDataSize = BitConverter.ToInt32(sizeInfo, 0); // sizeInfo 바이트 배열엔 웹캠 데이터의 크기가 바이트 배열로 담겨있음.
-                    Debug.Log(webcamDataSize);
                     byte[] data = new byte[webcamDataSize];     // 데이터를 저장할 바이트 배열
                     if (ReadFull(_stream, data, webcamDataSize)) // 스트림에서 데이터를 읽음
                     {
