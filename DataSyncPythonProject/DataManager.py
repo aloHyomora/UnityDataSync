@@ -1,7 +1,6 @@
 import socket
 import time
 import cv2
-import pickle
 import struct
 
 
@@ -81,9 +80,13 @@ def send_webcam_data(connection):
             isFrameCaptured, frame = vc.read()
             if not isFrameCaptured:
                 break
-            data = pickle.dumps(
-                frame
-            )  # 프레임을 바이트 스트림으로 직렬화, 저장 혹은 네트워크로 전송할 수 있는 형식으로 변환하는 과정
+
+            # 프레임을 JPEG 포맷으로 압축
+            ret, buffer = cv2.imencode(".jpg", frame)
+            if not ret:
+                continue
+
+            data = buffer.tobytes()  # buffer를 바이트로 변환
             size = struct.pack(
                 ">L", len(data)
             )  # 포맷 (">L")에 따라 객체를 패키징하여 바이트 객체로 변환, 빅 엔디언 바이트 순서의 unsigned long(4바이트) 정수를 나타냄
