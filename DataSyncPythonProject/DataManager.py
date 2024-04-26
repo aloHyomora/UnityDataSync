@@ -101,11 +101,11 @@ def send_webcam_size_data(connection, videoCapture):
     videoCapture.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)  # 너비 설정
     videoCapture.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)  # 높이 설정
 
-    height = int(videoCapture.get(cv2.CAP_PROP_FRAME_WIDTH))
-    width = int(videoCapture.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    width = int(videoCapture.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(videoCapture.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     # 초기 설정 정보 전송 (해상도)
-    init_info = struct.pack(">II", width, height)
+    init_info = struct.pack("<LL", width, height)
     connection.sendall(init_info)
 
 
