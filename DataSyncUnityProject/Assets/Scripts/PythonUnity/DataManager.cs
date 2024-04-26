@@ -14,8 +14,8 @@ public class DataManager : MonoBehaviour
 	private void Start()
 	{
 		ConnectToServer();
-		StartCoroutine(SendingIntDataRoutine());
-		StartCoroutine(ReceivingFloatDataRoutine());
+		// StartCoroutine(SendingIntDataRoutine());
+		// StartCoroutine(ReceivingFloatDataRoutine());
 	}
 
 	void ConnectToServer()
